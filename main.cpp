@@ -68,7 +68,8 @@ void do_synthesize(const std::string& sentence,
                    middleware::runner& decoder_model,
                    const std::vector<float>& g,
                    float speed,
-                   int sample_rate) {
+                   int sample_rate,
+                   float volume) {
     utilities::timer timer;
     printf("sentence: %s\n", sentence.c_str());
     printf("wav: %s\n", wav_file.c_str());
@@ -132,6 +133,17 @@ void do_synthesize(const std::string& sentence,
         printf("Decode slice(%d/%d) take %.2fms\n", i + 1, dec_slice_num, timer.elapsed<utilities::timer::milliseconds>());
     }
 
+    // Apply volume gain
+    if (volume != 1.0f) {
+        printf("Applying volume factor: %.2f\n", volume);
+        for (float& sample : wavlist) {
+            sample *= volume;
+            // Clamp to avoid clipping
+            if (sample > 1.0f) sample = 1.0f;
+            else if (sample < -1.0f) sample = -1.0f;
+        }
+    }
+
     AudioFile<float> audio_file;
     std::vector<std::vector<float> > audio_samples{wavlist};
     audio_file.setAudioBuffer(audio_samples);
@@ -159,6 +171,7 @@ int main(int argc, char** argv) {
 
     cmd.add<float>("speed", 0, "speak speed", false, 0.8f);
     cmd.add<int>("sample_rate", 0, "sample rate", false, 44100);
+    cmd.add<float>("volume", 0, "output volume", false, 1.0f);
     cmd.parse_check(argc, argv);
 
     auto encoder_file   = cmd.get<std::string>("encoder");
@@ -169,6 +182,7 @@ int main(int argc, char** argv) {
 
     auto speed          = cmd.get<float>("speed");
     auto sample_rate    = cmd.get<int>("sample_rate");
+    auto volume         = cmd.get<float>("volume");
 
     printf("encoder: %s\n", encoder_file.c_str());
     printf("decoder: %s\n", decoder_file.c_str());
@@ -176,6 +190,7 @@ int main(int argc, char** argv) {
     printf("token: %s\n", token_file.c_str());
     printf("speed: %f\n", speed);
     printf("sample_rate: %d\n", sample_rate);
+    printf("volume: %f\n", volume);
 
     // Load lexicon
     Lexicon lexicon(lexicon_file, token_file);
@@ -213,7 +228,7 @@ int main(int argc, char** argv) {
             return 1;
         }
         printf("Running in single mode.\n");
-        do_synthesize(sentence_arg, wav_arg, lexicon, encoder, *decoder_model, g, speed, sample_rate);
+        do_synthesize(sentence_arg, wav_arg, lexicon, encoder, *decoder_model, g, speed, sample_rate, volume);
     } else {
         printf("Running in interactive mode.\n");
         std::string sentence;
@@ -239,7 +254,7 @@ int main(int argc, char** argv) {
             if (wav_file.empty()) {
                 wav_file = "output.wav"; // default
             }
-            do_synthesize(sentence, wav_file, lexicon, encoder, *decoder_model, g, speed, sample_rate);
+            do_synthesize(sentence, wav_file, lexicon, encoder, *decoder_model, g, speed, sample_rate, volume);
         }
         printf("Exiting.\n");
     }
