@@ -4,6 +4,7 @@ import queue
 from flask import Flask, request, jsonify
 import os
 import atexit
+import json
 
 app = Flask(__name__)
 # A single queue to serialize all incoming requests
@@ -15,12 +16,31 @@ melotts_process = None
 # Path to the melotts executable.
 EXECUTABLE_PATH = os.path.abspath("../install/melotts")
 
+melotts_args = []
+
+# Load arguments from arguments.json if it exists
+try:
+    arguments_json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'arguments.json'))
+    if os.path.exists(arguments_json_path):
+        with open(arguments_json_path, 'r') as f:
+            args_config = json.load(f)
+            # Map the arguments from the JSON file
+            for key, value in args_config.items():
+                melotts_args.append(f'--{key}')
+                melotts_args.append(str(value))
+        print(f'Loaded arguments from {arguments_json_path}')
+    else:
+        print(f'No arguments.json found at {arguments_json_path}, using default arguments')
+except Exception as e:
+    print(f'Error loading arguments.json: {e}')
+# --- End Configuration ---
+
 def start_melotts_process():
     """Starts and initializes the melotts C++ process."""
     global melotts_process
 
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    command = [EXECUTABLE_PATH]
+    command = [EXECUTABLE_PATH] + melotts_args
 
     print(f"Starting melotts process: {' '.join(command)} from {project_root}")
 
