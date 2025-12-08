@@ -93,8 +93,10 @@ void do_synthesize(const std::string& sentence,
     timer.stop();
     printf("Encoder run take %.2fms\n", timer.elapsed<utilities::timer::milliseconds>());
 
-    float* zp_data = encoder_output.at(0).GetTensorMutableData<float>();
-    int audio_len = encoder_output.at(2).GetTensorMutableData<int>()[0];
+    auto& zp_tensor = encoder_output.at(0);
+    float* zp_data = zp_tensor.GetTensorMutableData<float>();
+    int* audio_len_ptr = encoder_output.at(2).GetTensorMutableData<int>();
+    int audio_len = audio_len_ptr[0];
     auto zp_info = encoder_output.at(0).GetTensorTypeAndShapeInfo();
     auto zp_shape = zp_info.GetShape();
 

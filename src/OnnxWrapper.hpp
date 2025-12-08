@@ -15,7 +15,7 @@ public:
     std::vector<Ort::Value> Run(std::vector<int>& phone, 
                                 std::vector<int>& tones,
                                 std::vector<int>& langids,
-                                std::vector<float>& g,
+                                const std::vector<float>& g,
                                 
                                 float noise_scale,
                                 float length_scale,
