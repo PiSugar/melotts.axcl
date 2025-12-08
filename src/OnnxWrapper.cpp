@@ -69,7 +69,7 @@ std::vector<Ort::Value> OnnxWrapper::Run(std::vector<int>& phone,
     input_vals.emplace_back(Ort::Value::CreateTensor<int>(memory_info_handler, phone.data(), phone.size(), phone_dims.data(), phone_dims.size()));
     input_vals.emplace_back(Ort::Value::CreateTensor<int>(memory_info_handler, tones.data(), tones.size(), tones_dims.data(), tones_dims.size()));
     input_vals.emplace_back(Ort::Value::CreateTensor<int>(memory_info_handler, langids.data(), langids.size(), langids_dims.data(), langids_dims.size()));
-    input_vals.emplace_back(Ort::Value::CreateTensor<float>(memory_info_handler, g.data(), g.size(), g_dims.data(), g_dims.size()));
+    input_vals.emplace_back(Ort::Value::CreateTensor<float>(memory_info_handler, const_cast<float*>(g.data()), g.size(), g_dims.data(), g_dims.size()));
     input_vals.emplace_back(Ort::Value::CreateTensor<float>(memory_info_handler, &noise_scale, 1, noise_scale_dims.data(), noise_scale_dims.size()));
     input_vals.emplace_back(Ort::Value::CreateTensor<float>(memory_info_handler, &noise_scale_w, 1, noise_scale_w_dims.data(), noise_scale_w_dims.size()));
     input_vals.emplace_back(Ort::Value::CreateTensor<float>(memory_info_handler, &length_scale, 1, length_scale_dims.data(), length_scale_dims.size()));
