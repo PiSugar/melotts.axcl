@@ -145,6 +145,9 @@ void do_synthesize(const std::string& sentence,
 }
 
 int main(int argc, char** argv) {
+    // Set stdout to line-buffered mode to ensure timely output to parent processes
+    setvbuf(stdout, NULL, _IOLBF, 0);
+
     cmdline::parser cmd;
     cmd.add<std::string>("encoder", 'e', "encoder onnx", false, "./models/encoder.onnx");
     cmd.add<std::string>("decoder", 'd', "decoder axmodel", false, "./models/decoder.axmodel");
@@ -216,7 +219,7 @@ int main(int argc, char** argv) {
         std::string sentence;
         std::string wav_file;
         while (true) {
-            std::cout << "\nEnter a sentence (or 'quit' to exit): ";
+            std::cout << "\nEnter a sentence (or 'quit' to exit): " << std::endl;
             if (!std::getline(std::cin, sentence)) {
                 break; // End of input stream
             }
@@ -228,7 +231,7 @@ int main(int argc, char** argv) {
                 continue;
             }
 
-            std::cout << "Enter the output wav file path (e.g., output.wav): ";
+            std::cout << "Enter the output wav file path (e.g., output.wav): " << std::endl;
             if (!std::getline(std::cin, wav_file)) {
                 break;
             }
