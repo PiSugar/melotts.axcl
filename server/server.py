@@ -135,10 +135,10 @@ def synthesis_worker():
 @app.route('/synthesize', methods=['POST'])
 def synthesize_endpoint():
     data = request.get_json()
-    if not data or 'sentence' not in data or 'output_path' not in data:
-        return jsonify({'success': False, 'error': 'Invalid request. "sentence" and "output_path" are required.'}), 400
+    if not data or 'sentence' not in data or 'outputPath' not in data:
+        return jsonify({'success': False, 'error': 'Invalid request. "sentence" and "outputPath" are required.'}), 400
 
-    output_path = os.path.abspath(data['output_path'])
+    output_path = os.path.abspath(data['outputPath'])
     output_dir = os.path.dirname(output_path)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
