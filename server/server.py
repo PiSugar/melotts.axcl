@@ -14,7 +14,7 @@ request_queue = queue.Queue()
 melotts_process = None
 
 # Path to the melotts executable.
-EXECUTABLE_PATH = os.path.abspath("../install/melotts")
+EXECUTABLE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'install', 'melotts'))
 
 melotts_args = []
 
