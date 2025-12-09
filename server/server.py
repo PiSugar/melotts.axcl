@@ -116,13 +116,17 @@ def synthesis_worker():
             melotts_process.stdin.write(output_path + '\n')
             melotts_process.stdin.flush()
 
+            output_seen = False
+            prompt_seen = False
             for line in iter(melotts_process.stdout.readline, ''):
                 print(f"[melotts-stdout]: {line.strip()}")
                 if "Saved audio to" in line:
-                    is_success = True
-                    break
+                    output_seen = True
                 if "Enter a sentence" in line:
-                    break
+                    prompt_seen = True
+                    break  # The prompt is the last thing we expect for this transaction
+            is_success = output_seen
+
         except Exception as e:
             print(f"An error occurred in the worker while communicating with the melotts process: {e}")
             is_success = False

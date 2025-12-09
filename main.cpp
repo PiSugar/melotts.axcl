@@ -154,6 +154,7 @@ void do_synthesize(const std::string& sentence,
     }
 
     printf("Saved audio to %s\n", wav_file.c_str());
+    fflush(stdout);
 }
 
 int main(int argc, char** argv) {
