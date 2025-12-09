@@ -119,13 +119,18 @@ def synthesis_worker():
             output_seen = False
             prompt_seen = False
             for line in iter(melotts_process.stdout.readline, ''):
-                print(f"[melotts-stdout]: {line.strip()}")
-                if "Saved audio to" in line:
+                stripped_line = line.strip()
+                print(f"[melotts-stdout]: {stripped_line}")
+                if "Saved audio to" in stripped_line:
                     output_seen = True
-                if "Enter a sentence" in line:
+                if "[DEBUG] do_synthesize finished." in stripped_line:
+                    print("Debug: Synthesis function finished.")
+                if "[DEBUG] Top of interactive loop." in stripped_line:
+                    print("Debug: C++ loop restarted.")
+                if "Enter a sentence" in stripped_line:
                     prompt_seen = True
                     break  # The prompt is the last thing we expect for this transaction
-            is_success = output_seen
+            is_success = output_seen and prompt_seen
 
         except Exception as e:
             print(f"An error occurred in the worker while communicating with the melotts process: {e}")

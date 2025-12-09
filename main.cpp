@@ -155,6 +155,8 @@ void do_synthesize(const std::string& sentence,
 
     printf("Saved audio to %s\n", wav_file.c_str());
     fflush(stdout);
+    printf("[DEBUG] do_synthesize finished.\n");
+    fflush(stdout);
 }
 
 int main(int argc, char** argv) {
@@ -235,6 +237,8 @@ int main(int argc, char** argv) {
         std::string sentence;
         std::string wav_file;
         while (true) {
+            printf("[DEBUG] Top of interactive loop.\n");
+            fflush(stdout);
             std::cout << "\nEnter a sentence (or 'quit' to exit): " << std::endl;
             if (!std::getline(std::cin, sentence)) {
                 break; // End of input stream
