@@ -35,6 +35,13 @@ except Exception as e:
     print(f'Error loading arguments.json: {e}')
 # --- End Configuration ---
 
+def sleep(seconds):
+    """Sleep function that handles interruptions."""
+    try:
+        threading.Event().wait(seconds)
+    except KeyboardInterrupt:
+        pass
+
 def start_melotts_process():
     """Starts and initializes the melotts C++ process."""
     global melotts_process
@@ -112,8 +119,10 @@ def synthesis_worker():
                 print(f"[melotts-stdout]: {line.strip()}")
                 if "Enter the output wav file path" in line:
                     break
+                
+            sleep(0.1)  # Small delay to ensure melotts is ready for the next input
 
-            melotts_process.stdin.write(output_path + '\n')
+            melotts_process.stdin.write(output_path + '\n\n')
             melotts_process.stdin.flush()
 
             output_seen = False
