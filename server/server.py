@@ -182,6 +182,32 @@ def synthesize_endpoint():
     else:
         return jsonify({'success': False, 'error': 'Synthesis failed. Check server logs for details.'}), 500
 
+# send enter signal to melotts process    
+@app.route('/enter', methods=['POST'])
+def enter_endpoint():
+    try:
+        melotts_process.stdin.write('\n')
+        melotts_process.stdin.flush()
+        return jsonify({'success': True})
+    except Exception as e:
+        print(f"An error occurred while sending enter signal: {e}")
+        return jsonify({'success': False, 'error': 'Failed to send enter signal.'}), 500
+    
+@app.route('/restart', methods=['POST'])
+def restart_endpoint():
+    global melotts_process
+    try:
+        melotts_process.terminate()
+        melotts_process.wait()
+        if start_melotts_process():
+            return jsonify({'success': True})
+        else:
+            return jsonify({'success': False, 'error': 'Failed to restart melotts process.'}), 500
+    except Exception as e:
+        print(f"An error occurred while restarting melotts process: {e}")
+        return jsonify({'success': False, 'error': 'Failed to restart melotts process.'}), 500
+
+
 if __name__ == '__main__':
     if start_melotts_process():
         # Start the single worker thread that will process the queue
