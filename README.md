@@ -1,74 +1,87 @@
 # melotts.axcl
-MeloTTS demo on Axera Card
 
-## 编译
+This repository is a fork of [melotts.axcl](https://github.com/ml-inory/melotts.axcl), which is an implementation of the [MeloTTS](https://arxiv.org/abs/2211.13227) text-to-speech model runing on LLM8850 accelerator card.
 
-- 支持在 x86_64、aarch64 平台下本地编译
-- 支持在 x86_64 下交叉编译生成 aarch64 环境中可运行的程序
+In order to provide continus audio synthesis service, we have added a server implementation in Python that interacts with the melotts C++ binary. The server listens for incoming text requests, processes them using the melotts model, and returns the generated audio files. In this way, the program does have to load the model for each request, significantly improving performance for multiple requests.
 
-x86_64
-```
-./build.sh
-```
+## Compile on Pi 5
 
-aarch64
+aarch64 build script:
+
 ```
 ./build_aarch64.sh
 ```
 
-交叉编译
-```
-./cross_compile.sh
+## Download Models
+
+[Chinese Models](https://huggingface.co/M5Stack/MeloTTS-Chinese-ax650)
+
+[English Models](https://huggingface.co/M5Stack/MeloTTS-English-ax650)
+
+[Japanese Models](https://huggingface.co/M5Stack/MeloTTS-Japanese-ax650)
+
+[Spanish Models](https://huggingface.co/M5Stack/MeloTTS-Spanish-ax650)
+
+You can fork the model repositories and link them in `arguments.json` for easier management.
+
+## Start Server
+
+Run in the root directory of the `bash serve.sh`, which will start the server at `http://localhost:8802`.
+
+## Arguments Configuration
+
+The server uses the `arguments.json` file to configure the model paths and parameters. Make sure to update the paths in `arguments.json` to point to the correct model files you downloaded.
+
+For example, for English models, the `arguments.json` should look like this:
+
+```json
+{
+  "encoder": "/path/to/MeloTTS-English-ax650/encoder-en.onnx",
+  "decoder": "/path/to/MeloTTS-English-ax650/decoder-en-us.axmodel",
+  "lexicon": "/path/to/MeloTTS-English-ax650/lexicon-en.txt",
+  "token": "/path/to/MeloTTS-English-ax650/tokens-en.txt",
+  "g": "/path/to/MeloTTS-English-ax650/g-en-us.bin",
+  "volume": "4"
+}
 ```
 
-## 下载模型
-```
-./download_models.sh
+## Request Format
+
+The server accepts POST requests with a JSON payload containing the text to be synthesized. The request format is as follows:
+
+```bash
+curl -X POST http://localhost:8802/synthesize \
+     -H "Content-Type: application/json" \
+     -d '{"sentence": "hello, i'm a student from some where", "outputPath": "/path/to/output.wav"}'
 ```
 
-## 运行
-在 `melotts.axcl` 项目根目录下运行
+Response:
+```json
+{
+  "success": true,
+}
+```
 
+Error Response:
+```json
+{
+  "success": false,
+  "error": "Error message here"
+}
 ```
-(base) axera@raspberrypi:~/melotts.axcl $ ./install/melotts
-encoder: ./models/encoder.onnx
-decoder: ./models/decoder.axmodel
-lexicon: ./models/lexicon.txt
-token: ./models/tokens.txt
-sentence: 爱芯元智半导体股份有限公司，致力于打造世界领先的人工智能感知与边缘计算芯片。服务智慧城市、智能驾驶、机器人的海量普惠的应用
-wav: output.wav
-speed: 0.800000
-sample_rate: 44100
-Load encoder
-Load decoder model
-Encoder run take 191.25ms
-decoder slice num: 9
-Decode slice(1/9) take 39.90ms
-Decode slice(2/9) take 39.66ms
-Decode slice(3/9) take 39.98ms
-Decode slice(4/9) take 39.57ms
-Decode slice(5/9) take 40.28ms
-Decode slice(6/9) take 39.68ms
-Decode slice(7/9) take 39.59ms
-Decode slice(8/9) take 39.58ms
-Decode slice(9/9) take 41.11ms
-Saved audio to output.wav
 
+If the melotts process is not running correctly, use `/restart` endpoint to restart it:
+
+```bash
+curl -X POST http://localhost:8802/restart
 ```
-更多运行参数:  
-```
-(base) axera@raspberrypi:~/melotts.axcl $ ./install/melotts -h
-undefined short option: -h
-usage: ./install/melotts [options] ...
-options:
-  -e, --encoder        encoder onnx (string [=./models/encoder.onnx])
-  -d, --decoder        decoder axmodel (string [=./models/decoder.axmodel])
-  -l, --lexicon        lexicon.txt (string [=./models/lexicon.txt])
-  -t, --token          tokens.txt (string [=./models/tokens.txt])
-      --g              g.bin (string [=./models/g.bin])
-  -s, --sentence       input sentence (string [=爱芯元智半导体股份有限公司，致力于打造世界领先的人工智能感知与边缘计算芯片。服务智慧城市、智能驾驶、机器人的海量普惠的应用])
-  -w, --wav            wav file (string [=output.wav])
-      --speed          speak speed (float [=0.8])
-      --sample_rate    sample rate (int [=44100])
-  -?, --help           print this message
+
+## Run as Systemd Service
+
+A systemd service file `melotts.service` is provided to run the server as a background.
+
+To enable and start the service, use the following commands:
+
+```bash
+sudo bash startup.sh
 ```
