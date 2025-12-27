@@ -6,9 +6,12 @@ In order to provide continus audio synthesis service, we have added a server imp
 
 ## Compile on Pi 5
 
-aarch64 build script:
+Clone this repository and run the aarch64 build script:
 
 ```
+cd
+git clone https://github.com/PiSugar/melotts.axcl.git
+cd melotts.axcl
 sudo chmod +x build_aarch64.sh
 ./build_aarch64.sh
 ```
