@@ -9,6 +9,7 @@ In order to provide continus audio synthesis service, we have added a server imp
 aarch64 build script:
 
 ```
+sudo chmod +x build_aarch64.sh
 ./build_aarch64.sh
 ```
 
