@@ -4,6 +4,15 @@ This repository is a fork of [melotts.axcl](https://github.com/ml-inory/melotts.
 
 In order to provide continus audio synthesis service, we have added a server implementation in Python that interacts with the melotts C++ binary. The server listens for incoming text requests, processes them using the melotts model, and returns the generated audio files. In this way, the program does have to load the model for each request, significantly improving performance for multiple requests.
 
+## Prerequisites
+
+Building this project requires `cmake`, make sure to install it first:
+
+```bash
+sudo apt update
+sudo apt install -y cmake
+```
+
 ## Compile on Pi 5
 
 Clone this repository and run the aarch64 build script:
