@@ -36,11 +36,11 @@ For example, for English models, the `arguments.json` should look like this:
 
 ```json
 {
-  "encoder": "/path/to/MeloTTS-English-ax650/encoder-en.onnx",
-  "decoder": "/path/to/MeloTTS-English-ax650/decoder-en-us.axmodel",
-  "lexicon": "/path/to/MeloTTS-English-ax650/lexicon-en.txt",
-  "token": "/path/to/MeloTTS-English-ax650/tokens-en.txt",
-  "g": "/path/to/MeloTTS-English-ax650/g-en-us.bin",
+  "encoder": "/home/pi/MeloTTS-English-ax650/encoder-en.onnx",
+  "decoder": "/home/pi/MeloTTS-English-ax650/decoder-en-br.axmodel",
+  "lexicon": "/home/pi/MeloTTS-English-ax650/lexicon-en.txt",
+  "token": "/home/pi/MeloTTS-English-ax650/tokens-en.txt",
+  "g": "/home/pi/MeloTTS-English-ax650/g-en-br.bin",
   "volume": "4"
 }
 ```
