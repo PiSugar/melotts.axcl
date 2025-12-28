@@ -35,7 +35,7 @@ sudo chmod +x build_aarch64.sh
 
 [Spanish Models](https://huggingface.co/M5Stack/MeloTTS-Spanish-ax650)
 
-You can fork the model repositories and link them in `arguments.json` for easier management.
+You can clone the model repositories and link them in `arguments.json` for easier management.
 
 ## Start Server
 
