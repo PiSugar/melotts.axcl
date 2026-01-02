@@ -68,12 +68,17 @@ curl -X POST http://localhost:8802/synthesize \
      -d '{"sentence": "hello, i'm a student from some where", "outputPath": "/path/to/output.wav"}'
 ```
 
+If `outputPath` is not provided, the server will create a temporary file and delete it after returning the base64 encoded audio data.
+
 Response:
 ```json
 {
   "success": true,
+  "base64": "wav_file_in_base64_format"
 }
 ```
+
+The `base64` is always provided when `outputPath` is not given in the request body.
 
 Error Response:
 ```json
