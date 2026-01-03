@@ -6,6 +6,7 @@ import os
 import atexit
 import json
 import base64
+import time
 
 app = Flask(__name__)
 # A single queue to serialize all incoming requests
@@ -171,7 +172,7 @@ def synthesize_endpoint():
     output_path = ""
     if use_base64:
         # join '/tmp' with a unique filename with timestamp
-        output_path = os.path.join('/tmp', f'melotts_output_{int(threading.current_thread().time())}.wav')
+        output_path = os.path.join('/tmp', f'melotts_output_{int(time.time())}.wav')
     else:
         output_path = os.path.abspath(data['outputPath'])
         
