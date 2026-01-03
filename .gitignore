@@ -1,4 +1,5 @@
 *.log
 install/
 build/
+tmp/
 arguments.json

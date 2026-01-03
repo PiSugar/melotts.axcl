@@ -5,6 +5,8 @@ from flask import Flask, request, jsonify
 import os
 import atexit
 import json
+import base64
+import time
 
 app = Flask(__name__)
 # A single queue to serialize all incoming requests
@@ -153,10 +155,27 @@ def synthesis_worker():
 @app.route('/synthesize', methods=['POST'])
 def synthesize_endpoint():
     data = request.get_json()
-    if not data or 'sentence' not in data or 'outputPath' not in data:
-        return jsonify({'success': False, 'error': 'Invalid request. "sentence" and "outputPath" are required.'}), 400
-
-    output_path = os.path.abspath(data['outputPath'])
+    sentence = data.get('sentence')
+    output_path = data.get('outputPath')
+    use_base64 = data.get('base64', False)
+    
+    # if not data or 'sentence' not in data or 'outputPath' not in data:
+    #     return jsonify({'success': False, 'error': 'Invalid request. "sentence" and "outputPath" are required.'}), 400
+    
+    if sentence is None:
+        return jsonify({'success': False, 'error': 'Invalid request. "sentence" is required.'}), 400
+    
+    # outputPath or base64 must be provided
+    if output_path is None and not use_base64:
+        use_base64 = True  # default to base64 if no outputPath is given
+    
+    output_path = ""
+    if use_base64:
+        # join '/tmp' with a unique filename with timestamp
+        output_path = os.path.join('/tmp', f'melotts_output_{int(time.time())}.wav')
+    else:
+        output_path = os.path.abspath(data['outputPath'])
+        
     output_dir = os.path.dirname(output_path)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
@@ -178,7 +197,17 @@ def synthesize_endpoint():
     print(f"Request thread received result: {is_success}")
 
     if is_success:
-        return jsonify({'success': True})
+        # read the file and encode it to base64
+        file_base64 = ""
+        if os.path.exists(output_path):
+            with open(output_path, 'rb') as f:
+                file_data = f.read()
+                file_base64 = base64.b64encode(file_data).decode('utf-8')
+            if use_base64:
+                # delete the temporary file
+                os.remove(output_path)
+        
+        return jsonify({'success': True, 'base64': file_base64 })
     else:
         return jsonify({'success': False, 'error': 'Synthesis failed. Check server logs for details.'}), 500
 
